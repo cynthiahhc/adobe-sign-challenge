@@ -1,9 +1,14 @@
+// Inputs validation before submitting the form to Adobe Sign API.
+
+
+// set up event listeners for the first email input field
 var emailGroup = document.getElementsByClassName("emailGroup")[0];
 addEmailOnBlurListener(emailGroup);
 addDeleteOnClickListener(emailGroup);
 
-var file = document.getElementById("uploadFile");
 
+// set up event listeners to the file input field
+var file = document.getElementById("uploadFile");
 file.addEventListener("change", function(event) {
     var filePath = file.value;
     var fileName = "";
@@ -11,11 +16,14 @@ file.addEventListener("change", function(event) {
     if (filePath !== "") {
         fileName = filePath.split('\\').pop().split('/').pop();
         document.getElementById("fileLabel").innerHTML = fileName;
+    } else {
+        document.getElementById("fileLabel").innerHTML = "Select a Document";
     }
     disableButtons(undefined);
 });
 
 
+// validate if the selected file is a pdf file
 function isValidPDF() {
     var filePath = file.value;
     var fileName = "";
@@ -33,9 +41,10 @@ function isValidPDF() {
         errMsg.style.display = "none";
         return true;
     }
-    errMsg.style.display = "inline";
+    errMsg.style.display = "none";
     return false;
 }
+
 
 // add email input field event listner
 function addEmailOnBlurListener(emailGroup){
@@ -44,6 +53,7 @@ function addEmailOnBlurListener(emailGroup){
         validateAllEmails(event.target);
     });
 }
+
 
 // add delete email input field event listener
 function addDeleteOnClickListener(emailGroup) {
@@ -55,6 +65,7 @@ function addDeleteOnClickListener(emailGroup) {
         }
     });
 }
+
 
 // add new email input fields
 function addRecipient() {
@@ -76,6 +87,7 @@ function validateEmail(email) {
     }
     return true;
 }
+
 
 // validate if all emails are entered and valid
 function validateAllEmails(emailNode) {
@@ -100,15 +112,23 @@ function validateAllEmails(emailNode) {
     }
 }
 
-
+// disable add recipient button and/or submit button
 function disableButtons(isDisabled) {
+    var addButton = document.getElementById("addRecipientButton");
+    var submitButton = document.getElementById("submitButton");
+
     if (isDisabled !== undefined) {
-        document.getElementById("addRecipientButton").disabled = isDisabled;
+        addButton.disabled = isDisabled;
+        if (isDisabled) {
+            submitButton.disabled = isDisabled;
+        } else {
+            submitButton.disabled = !isValidPDF();
+        }
     } else {
-        document.getElementById("submitButton").disabled = !isValidPDF();
+        if (!isValidPDF()) {
+            submitButton.disabled = true;
+        } else if (isValidPDF() && !addButton.disabled) {
+            submitButton.disabled = false;
+        }
     }
 }
-
-
-
-
