@@ -4,44 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
     <title>Adobe Sign Challenge</title>
 </head>
 
 <body>
     <div class="jumbotron">
-        <h1 class="display-4">Adobe Sign Challenge</h1>
+        <h1 class="display-4 text-uppercase font-weight-bold">Adobe Sign Challenge</h1>
         <p class="lead">Send an agreement from the attached file to 2 or more recipients to sign.</p>
     </div>
 
     <div class="container">
         <div class="row justify-content-center">
             <div class="col col-xs-12 col-sm-10 col-md-8">
-                <form  enctype="multipart/form-data" method="post" name="fileinfo">
-                    <div class="form-group">
-                        <input type="email" class="form-control" autofocus name="userid" placeholder="Recipient's email" required size="32" maxlength="64" />
+                <form enctype="multipart/form-data" method="post" name="fileinfo" autocomplete="off">
+                    <div id="emailInputs">
+                        <div class="form-group emailGroup">
+                            <div class="input-group">
+                                <input type="email" class="form-control emailAddress" autofocus placeholder="Recipient's email" required size="32" maxlength="64" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text deleteRecipient">X</span>
+                                </div>
+                            </div>
+                            <span class="invalidEmail" style="display: none;">Enter a valid email address</span>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <button class="btn btn-outline-secondary btn-block">Add More Recipients</button>
+                        <button class="btn btn-outline-secondary btn-block" id="addRecipientButton" onClick="addRecipient()" disabled>Add More Recipients</button>
                     </div>
                     <div class="form-group" style="margin:50px 0px 50px 0px;">
                         <div class="custom-file" >
-                            <label class="custom-file-label" for="uploadFile">Choose file</label>
+                            <label class="custom-file-label" id="fileLabel" for="uploadFile">Select Document</label>
                             <input type="file" id="uploadFile" class="custom-file-input" name="File" required />
                         </div>
+                        <span class="invalidFile" style="display: none;">Select a PDF file</span>
                     </div>
-                    <div>
-                        <input type="submit" class="btn btn-secondary disabled" value="Send out for signature!" />
+                    <div class="d-flex justify-content-center">
+                        <input type="submit" id="submitButton" class="btn btn-secondary" value="SEND" disabled />
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-
-<script type="text/javascript" src="script.js"></script>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="script.js"></script>
+    <script type="text/javascript" src="adobe-api.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 </body>
 </html>

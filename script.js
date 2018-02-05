@@ -1,89 +1,112 @@
-// Enter Integration Key as token.
-var token = "";
+var emailGroup = document.getElementsByClassName("emailGroup")[0];
+addEmailOnBlurListener(emailGroup);
+addDeleteOnClickListener(emailGroup);
 
+var file = document.getElementById("uploadFile");
 
-var apiAccessPoint = "";
-var transientDocId = "";
+file.addEventListener("change", function(event) {
+    var filePath = file.value;
+    var fileName = "";
 
-
-var form = document.forms.namedItem("fileinfo");
-form.addEventListener('submit', function(event) {
-   getUris();
-   event.preventDefault();
-}, false);
-
-
-function getUris() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            apiAccessPoint = JSON.parse(request.responseText).api_access_point;
-            console.log("apiAccessPoint: " + apiAccessPoint);
-            uploadTransientDoc();
-        }
-    };
-    request.open("GET", "https://api.na1.echosign.com:443/api/rest/v5/base_uris", true);
-    request.setRequestHeader("Content-type", "application/json");
-    request.setRequestHeader("Access-Token", token);
-    request.send();
-}
-
-
-function uploadTransientDoc() {
-    var data = new FormData(form);
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 201) {
-            transientDocId = JSON.parse(request.responseText).transientDocumentId;
-            console.log("transientDocId: " + transientDocId);
-            sendAgreement();
-        }
-    };
-
-    request.open("POST", apiAccessPoint + "api/rest/v5/transientDocuments", true);
-    request.setRequestHeader("Access-Token", token);
-    request.send(data);
-}
-
-
-
-var agreementCreationInfo = {
-    "documentCreationInfo": {
-        "fileInfos": [
-            {
-                "transientDocumentId": ""
-            }
-        ],
-        "name": "TestAgreement",
-        "recipientSetInfos": [
-            {
-                "recipientSetMemberInfos": [],
-                "recipientSetRole": "SIGNER"
-            }
-        ],
-        "signatureType": "ESIGN",
-        "signatureFlow": "SENDER_SIGNATURE_NOT_REQUIRED"
+    if (filePath !== "") {
+        fileName = filePath.split('\\').pop().split('/').pop();
+        document.getElementById("fileLabel").innerHTML = fileName;
     }
-};
+    disableButtons(undefined);
+});
 
 
-function sendAgreement() {
-    var request = new XMLHttpRequest();
-    request.open("POST", apiAccessPoint + "api/rest/v5/agreements", false);
-    request.setRequestHeader("Access-Token", token);
-    request.setRequestHeader("Content-Type", "application/json");
+function isValidPDF() {
+    var filePath = file.value;
+    var fileName = "";
+    var errMsg = document.getElementsByClassName("invalidFile")[0];
 
-    agreementCreationInfo.documentCreationInfo.fileInfos[0].transientDocumentId = transientDocId;
+    if (filePath !== "") {
+        fileName = filePath.split('\\').pop().split('/').pop();
+        var fileNameSplit = fileName.split(".");
 
-    var userEmails = ["cyn12399@gmail.com", "cynthiahhc@gmail.com"];
-    var recipientSetMemberInfos = [];
+        var fileExt = fileNameSplit[fileNameSplit.length - 1];
+        if (fileExt.toLowerCase() !== "pdf") {
+            errMsg.style.display = "inline";
+            return false;
+        }
+        errMsg.style.display = "none";
+        return true;
+    }
+    errMsg.style.display = "inline";
+    return false;
+}
 
-    userEmails.forEach(function(email) {
-        recipientSetMemberInfos.push({"email" : email});
+// add email input field event listner
+function addEmailOnBlurListener(emailGroup){
+    var emailNode = emailGroup.getElementsByClassName("emailAddress")[0];
+    emailNode.addEventListener("blur", function(event) {
+        validateAllEmails(event.target);
     });
-    agreementCreationInfo.documentCreationInfo.recipientSetInfos[0].recipientSetMemberInfos = recipientSetMemberInfos;
+}
 
-    request.send(JSON.stringify(agreementCreationInfo));
+// add delete email input field event listener
+function addDeleteOnClickListener(emailGroup) {
+    var addOnNode = emailGroup.getElementsByClassName("deleteRecipient")[0];
+    addOnNode.addEventListener("click", function(event) {
+        if (document.getElementsByClassName("emailGroup").length > 1) {
+            emailGroup.parentNode.removeChild(emailGroup);
+            validateAllEmails(document.getElementsByClassName("emailAddress")[0]);
+        }
+    });
+}
+
+// add new email input fields
+function addRecipient() {
+    disableButtons(true);
+    var emailGroups = document.getElementsByClassName("emailGroup");
+    var parent = emailGroups[0].parentElement;
+    var newEmailGroup = emailGroups[0].cloneNode(true);
+    newEmailGroup.getElementsByTagName("input")[0].value = "";
+    addEmailOnBlurListener(newEmailGroup);
+    addDeleteOnClickListener(newEmailGroup);
+    parent.append(newEmailGroup);
+}
+
+
+// validate single email address
+function validateEmail(email) {
+    if (email !== "") {
+        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
+    }
+    return true;
+}
+
+// validate if all emails are entered and valid
+function validateAllEmails(emailNode) {
+    var isDisabled = false;
+        var email = emailNode.value;
+    if (email === "") {
+        disableButtons(true);
+    } else if (!validateEmail(email)) {
+        emailNode.parentNode.nextElementSibling.style.display = "inline";
+        disableButtons(true);
+    } else {
+        emailNode.parentNode.nextElementSibling.style.display = "none";
+        var emailNodes = document.getElementsByClassName("emailAddress");
+        for (var i = 0; i < emailNodes.length; i++) {
+            var email = emailNodes[i].value;
+            if (!email || !validateEmail(email)) {
+                emailNodes[i].parentNode.nextElementSibling.style.display = "inline";
+                isDisabled = true;
+            }
+        }
+        disableButtons(isDisabled);
+    }
+}
+
+
+function disableButtons(isDisabled) {
+    if (isDisabled !== undefined) {
+        document.getElementById("addRecipientButton").disabled = isDisabled;
+    } else {
+        document.getElementById("submitButton").disabled = !isValidPDF();
+    }
 }
 
 

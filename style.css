@@ -1,0 +1,16 @@
+.jumbotron {
+    background: linear-gradient(#ff0000, #000000);
+    color: #ffffff;
+}
+
+.jumbotron p {
+    text-shadow: 2px 2px 8px black;
+}
+
+.invalidEmail {
+    color: #b70000;
+}
+
+.invalidFile {
+    color: #b70000;
+}
